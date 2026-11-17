@@ -1,4 +1,6 @@
 # Article Hub API 🗞️
+Modified by Nicholas Benua Audlen Putra (H1101231042)
+For the purpose of finishing Cloud Computing class project 
 
 ## Overview
 Welcome to the Article Hub API! It’s a simple and easy-to-use service for accessing news articles and related data. It’s hosted online [here](https://article-hub-api.onrender.com/api) for anyone to use. (Please allow 1-2 minutes for the server to wake up)
