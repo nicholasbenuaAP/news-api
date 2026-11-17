@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  app1:
+    build: .
+    environment:
+      - DATABASE_URL=postgres://user:pass@db:5432/capstone
+      - PORT=3000
+    restart: unless-stopped
+  app2:
+    build: .
+    environment:
+      - DATABASE_URL=postgres://user:pass@db:5432/capstone
+      - PORT=3000
+    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: capstone
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql   # TAMBAHAN 1
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt:ro                        # TAMBAHAN 2
+    depends_on:
+      - app1
+      - app2
+  node-exporter:                                                    # TAMBAHAN 3
+    image: prom/node-exporter
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    command: ["--path.rootfs=/host"]
+    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "127.0.0.1:9090:9090"                                       # TAMBAHAN 4
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "127.0.0.1:3001:3000"                                       # TAMBAHAN 4
+    volumes:
+      - grafana-data:/var/lib/grafana                               # TAMBAHAN 5
+volumes:
+  pgdata:
+  grafana-data:
